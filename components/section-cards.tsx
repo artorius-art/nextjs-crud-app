@@ -9,23 +9,45 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
-import { TrendingUpIcon, TrendingDownIcon } from "lucide-react"
+import { TrendingUpIcon, TrendingDownIcon, Baby, BabyIcon, House, TreePalm, Banknote } from "lucide-react"
+import { useEffect, useState } from "react"
+import { supabase } from "@/lib/supabase"
 
 export function SectionCards() {
+
+  const [allData, setAllData] = useState<any[]>([])
+  const fetchAllData = async () => {
+    try {
+      const { data: result, error } = await supabase
+        .from('tabungan_master')
+        .select('*')
+        .eq('is_active', true)
+        .order('date', { ascending: false })
+
+      if (error) {
+        console.error('Error fetching all data:', error)
+      } else {
+        console.log(result)
+        setAllData(result || [])
+      }
+    } catch (error) {
+      console.error('Error:', error)
+    }
+  }
+  useEffect(() => {
+    fetchAllData()
+  }, [])
   return (
     <div className="*:data-[slot=card]:from-primary/5 *:data-[slot=card]:to-card dark:*:data-[slot=card]:bg-card grid grid-cols-1 gap-4 px-4 *:data-[slot=card]:bg-linear-to-t *:data-[slot=card]:shadow-xs lg:px-6 @xl/main:grid-cols-2 @5xl/main:grid-cols-4">
       <Card className="@container/card">
         <CardHeader>
-          <CardDescription>Total Revenue</CardDescription>
+          <CardDescription>Tabungan Anak</CardDescription>
           <CardTitle className="text-2xl font-semibold tabular-nums @[250px]/card:text-3xl">
-            $1,250.00
+            Rp. {allData.filter(item => item.jenis === 'anak').reduce((sum, item) => sum + item.nominal, 0).toLocaleString('id-ID')}
           </CardTitle>
           <CardAction>
-            <Badge variant="outline">
-              <TrendingUpIcon
+              <Baby size={30}
               />
-              +12.5%
-            </Badge>
           </CardAction>
         </CardHeader>
         <CardFooter className="flex-col items-start gap-1.5 text-sm">
@@ -40,16 +62,13 @@ export function SectionCards() {
       </Card>
       <Card className="@container/card">
         <CardHeader>
-          <CardDescription>New Customers</CardDescription>
+          <CardDescription>Tabungan Rumah</CardDescription>
           <CardTitle className="text-2xl font-semibold tabular-nums @[250px]/card:text-3xl">
-            1,234
+            Rp. {allData.filter(item => item.jenis === 'rumah').reduce((sum, item) => sum + item.nominal, 0).toLocaleString('id-ID')}
           </CardTitle>
           <CardAction>
-            <Badge variant="outline">
-              <TrendingDownIcon
+            <House size={30}
               />
-              -20%
-            </Badge>
           </CardAction>
         </CardHeader>
         <CardFooter className="flex-col items-start gap-1.5 text-sm">
@@ -64,16 +83,13 @@ export function SectionCards() {
       </Card>
       <Card className="@container/card">
         <CardHeader>
-          <CardDescription>Active Accounts</CardDescription>
+          <CardDescription>Tabungan Holiday</CardDescription>
           <CardTitle className="text-2xl font-semibold tabular-nums @[250px]/card:text-3xl">
-            45,678
+            Rp. {allData.filter(item => item.jenis === 'holiday').reduce((sum, item) => sum + item.nominal, 0).toLocaleString('id-ID')}
           </CardTitle>
           <CardAction>
-            <Badge variant="outline">
-              <TrendingUpIcon
+            <TreePalm size={30}
               />
-              +12.5%
-            </Badge>
           </CardAction>
         </CardHeader>
         <CardFooter className="flex-col items-start gap-1.5 text-sm">
@@ -86,16 +102,13 @@ export function SectionCards() {
       </Card>
       <Card className="@container/card">
         <CardHeader>
-          <CardDescription>Growth Rate</CardDescription>
+          <CardDescription>Total Tabungan</CardDescription>
           <CardTitle className="text-2xl font-semibold tabular-nums @[250px]/card:text-3xl">
-            4.5%
+            Rp. {allData.reduce((sum, item) => sum + item.nominal, 0).toLocaleString('id-ID')}
           </CardTitle>
           <CardAction>
-            <Badge variant="outline">
-              <TrendingUpIcon
+            <Banknote size={30}
               />
-              +4.5%
-            </Badge>
           </CardAction>
         </CardHeader>
         <CardFooter className="flex-col items-start gap-1.5 text-sm">

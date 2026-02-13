@@ -23,7 +23,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
   )
 
   const { data: { user } } = await supabase.auth.getUser()
-  console.log(user)
+  // console.log(user)
   return (
     <SidebarProvider
       style={

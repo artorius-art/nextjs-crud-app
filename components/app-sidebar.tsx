@@ -15,7 +15,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar"
-import { LayoutDashboardIcon, ListIcon, ChartBarIcon, FolderIcon, UsersIcon, CameraIcon, FileTextIcon, Settings2Icon, CircleHelpIcon, SearchIcon, DatabaseIcon, FileChartColumnIcon, FileIcon, CommandIcon } from "lucide-react"
+import { LayoutDashboardIcon, ListIcon, ChartBarIcon, FolderIcon, UsersIcon, CameraIcon, FileTextIcon, Settings2Icon, CircleHelpIcon, SearchIcon, DatabaseIcon, FileChartColumnIcon, FileIcon, CommandIcon, ChartBarStackedIcon, Banknote } from "lucide-react"
 const data = {
   user: {
     name: "shadcn",
@@ -149,18 +149,18 @@ const data = {
   // ],
   documents: [
     {
-      name: "Data Library",
-      url: "#",
+      name: "Dashboard",
+      url: "/dashboard",
       icon: (
-        <DatabaseIcon
+        <ChartBarStackedIcon
         />
       ),
     },
     {
-      name: "Reports",
-      url: "#",
+      name: "Tabungan",
+      url: "/dashboard/tabungan",
       icon: (
-        <FileChartColumnIcon
+        <Banknote
         />
       ),
     },
