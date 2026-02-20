@@ -33,6 +33,7 @@ import {
   ComboboxValue,
   useComboboxAnchor,
 } from "@/components/ui/combobox"
+import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card"
 
 
 
@@ -59,6 +60,12 @@ export function DataTable<TData, TValue>({
     state: {
       columnFilters,
     },
+    initialState: {
+    columnVisibility: {
+      date: false, // The key must match the accessorKey "date"
+      keterangan: false, // The key must match the accessorKey "date"
+    },
+  },
   })
     const startYear: number = 2024;
     const currentYear: number = new Date().getFullYear();
@@ -67,39 +74,69 @@ export function DataTable<TData, TValue>({
         { length: currentYear - startYear + 1 }, 
         (_, i) => startYear + i
     );
-    const anchor1 = useComboboxAnchor()
-    const anchor2 = useComboboxAnchor()
-  return (
+const months = [
+  { label: "Januari", value: "0" }, // Change these to strings
+  { label: "Februari", value: "1" },
+  { label: "Maret", value: "2" },
+  { label: "April", value: "3" },
+  { label: "Mei", value: "4" },
+  { label: "Juni", value: "5" },
+  { label: "Juli", value: "6" },
+  { label: "Agustus", value: "7" },
+  { label: "September", value: "8" },
+  { label: "Oktober", value: "9" },
+  { label: "November", value: "10" },
+  { label: "Desember", value: "11" },
+];    // const anchor1 = useComboboxAnchor()
+    // const anchor2 = useComboboxAnchor()
+    const anchor1 = React.useRef(null);
+    const anchor2 = React.useRef(null);
+const lastValueRef = React.useRef<string[]>([]);
+const lastChangeTimeRef = React.useRef<number>(0);  
+return (
     <div>
-{/* flex-col: stack them on mobile 
-        sm:flex-row: put them side-by-side on tablets/desktop
-  gap-4: prevents them from touching
-*/}
+
 <div className="flex flex-col sm:flex-row items-start gap-4 py-4 w-full">
   
-  {/* Wrap each Combobox in a div that handles its own width */}
+
   <div className="w-full sm:w-1/2 max-w-xs">
     <Combobox
       multiple
       autoHighlight
       items={years}
       defaultValue={[]}// Get current filter values from the table
-      value={(table.getColumn("date")?.getFilterValue() as string[]) ?? []}
+      value={(table.getColumn("date")?.getFilterValue() as any)?.years ?? []}
+      onValueChange={(val) => {
+            const currentFilter = (table.getColumn("date")?.getFilterValue() as any) || {};
+            table.getColumn("date")?.setFilterValue({ ...currentFilter, years: val });
+        }}
+    //   value={(table.getColumn("date")?.getFilterValue() as string[]) ?? []}
       // Update the table filter when selection changes
-      onValueChange={(selectedYears) => {
-        table.getColumn("date")?.setFilterValue(selectedYears);
-      }}
+    //   onValueChange={(selectedYears) => {
+    //     table.getColumn("date")?.setFilterValue(selectedYears);
+    //   }}
     >
       <ComboboxChips ref={anchor1} className="w-full">
         <ComboboxValue>
-          {(values) => (
+            {(values) => {
+                const yearList = Array.isArray(values) ? values : [];
+                return (
+                <React.Fragment>
+                    {yearList.map((value) => (
+                    <ComboboxChip key={value}>{value}</ComboboxChip>
+                    ))}
+                    <ComboboxChipsInput placeholder="Pilih Tahun" />
+                </React.Fragment>
+                );
+        }}
+          {/* {(values) => (
             <React.Fragment>
               {values.map((value: string) => (
                 <ComboboxChip key={value}>{value}</ComboboxChip>
               ))}
-              <ComboboxChipsInput placeholder="Start Year" />
+              <ComboboxChipsInput placeholder="Pilih Tahun" />
             </React.Fragment>
-          )}
+          )} */}
         </ComboboxValue>
       </ComboboxChips>
       <ComboboxContent anchor={anchor1}>
@@ -116,38 +153,72 @@ export function DataTable<TData, TValue>({
   </div>
 
   <div className="w-full sm:w-1/2 max-w-xs">
-    <Combobox
+  <Combobox
       multiple
-      autoHighlight
-      items={years}
-      defaultValue={[]}
-    >
+      
+      items={months}
+      value={(table.getColumn("date")?.getFilterValue() as any)?.months ?? []}
+      onValueChange={(val) => {
+      
+      const now = Date.now();
+      const timeSinceLastChange = now - lastChangeTimeRef.current;
+      
+      // Ignore if this is an empty array being set within 50ms of a non-empty one
+      // (likely a double-fire bug, not intentional deselection)
+      if (val.length === 0 && lastValueRef.current.length > 0 && timeSinceLastChange < 100) {
+          return;
+      }
+      
+      lastValueRef.current = val;
+      lastChangeTimeRef.current = now;
+      
+      const currentFilter = (table.getColumn("date")?.getFilterValue() as any) || {};
+      table.getColumn("date")?.setFilterValue({ 
+          ...currentFilter,
+          months: val
+      });
+  }}
+      // onValueChange={(val) => {
+      //     const currentFilter = (table.getColumn("date")?.getFilterValue() as any) || {};
+      //     table.getColumn("date")?.setFilterValue({ 
+      //         ...currentFilter, 
+      //         months: val 
+      //     });
+      // }}
+  >
       <ComboboxChips ref={anchor2} className="w-full">
-        <ComboboxValue>
-          {(values) => (
-            <React.Fragment>
-              {values.map((value: string) => (
-                <ComboboxChip key={value}>{value}</ComboboxChip>
-              ))}
-              <ComboboxChipsInput placeholder="End Year" />
-            </React.Fragment>
-          )}
-        </ComboboxValue>
+          <ComboboxValue>
+              {(values) => {
+                  const monthList = Array.isArray(values) ? values : [];
+                  return (
+                      <>
+                          {monthList.map((v) => (
+                              <ComboboxChip key={v}>
+                                  {months.find((m) => m.value === v)?.label}
+                              </ComboboxChip>
+                          ))}
+                          <ComboboxChipsInput placeholder="Pilih Bulan" />
+                      </>
+                  );
+              }}
+          </ComboboxValue>
       </ComboboxChips>
       <ComboboxContent anchor={anchor2}>
-        <ComboboxEmpty>No items found.</ComboboxEmpty>
-        <ComboboxList>
-          {(item) => (
-            <ComboboxItem key={item} value={item}>
-              {item}
-            </ComboboxItem>
-          )}
-        </ComboboxList>
+          <ComboboxEmpty>No items found.</ComboboxEmpty>
+          <ComboboxList>
+              {(item) => (
+                  <ComboboxItem key={item.value} value={item.value}>
+                      {item.label}
+                  </ComboboxItem>
+              )}
+          </ComboboxList>
       </ComboboxContent>
-    </Combobox>
+  </Combobox>  
   </div>
-</div>
-<div className="overflow-hidden rounded-md border">
+
+  </div>
+
+  <div className="overflow-hidden rounded-md border">
       <Table>
         <TableHeader>
           {table.getHeaderGroups().map((headerGroup) => (
@@ -191,6 +262,7 @@ export function DataTable<TData, TValue>({
         </TableBody>
       </Table>
     </div>
+
     <div className="flex items-center justify-end space-x-2 py-4">
         <Button
           variant="outline"
@@ -209,6 +281,8 @@ export function DataTable<TData, TValue>({
           Next
         </Button>
       </div>
+
     </div>
+    
   )
 }

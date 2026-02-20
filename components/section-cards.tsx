@@ -27,7 +27,7 @@ export function SectionCards() {
       if (error) {
         console.error('Error fetching all data:', error)
       } else {
-        console.log(result)
+        // console.log(result)
         setAllData(result || [])
       }
     } catch (error) {

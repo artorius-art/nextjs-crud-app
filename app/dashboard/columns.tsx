@@ -13,6 +13,7 @@ import {
   DropdownMenuGroup
 } from "@/components/ui/dropdown-menu"
 import { buttonVariants } from "@/components/ui/button"
+import { number } from "zod"
 
 
 
@@ -37,30 +38,59 @@ export type TabunganMaster = {
 export const columns: ColumnDef<TabunganMaster>[] = [
   {
     accessorKey: "nominal",
-     header: () => <div className="text-right">Nominal</div>,
-    cell: ({ row }) => {
-      const amount = parseFloat(row.getValue("nominal"))
-      const formatted = new Intl.NumberFormat("id-ID", {
-        style: "currency",
-        currency: "IDR",
-      }).format(amount)
- 
-      return <div className="text-right font-medium">{formatted}</div>
-    },
+     header: () => <div className="">Nominal</div>,
+        cell: ({ row }) => {
+        const amount = parseFloat(row.getValue("nominal"))
+        const rowDate = new Date(row.getValue("date"));
+        const rowKeterangan = String(row.getValue("keterangan") ?? "");
+        const formatted = new Intl.NumberFormat("id-ID", {
+            style: "currency",
+            currency: "IDR",
+            maximumFractionDigits: 0, 
+            minimumFractionDigits: 0, 
+        }).format(amount)
+
+        return (
+            <div>
+                <div className="font-bold text-xl">{formatted}</div>
+                <div className="text-muted-foreground text-sm">{rowDate.toLocaleDateString("id-ID", {
+                day: "numeric",
+                month: "long",
+                year: "numeric",
+                })}
+                </div>
+                {rowKeterangan ? (
+                  <blockquote className="mt-6 border-l-2 pl-6 italic">
+                    &quot;{rowKeterangan}&quot;
+                  </blockquote>
+                ) : null}
+            </div>
+            
+        )
+        
+        },
   },
   {
     accessorKey: "date",
     header: "Tanggal Transaksi",
-    filterFn: (row, columnId, filterValue: number[]) => {
-        if (!filterValue || filterValue.length === 0) return true;
+    filterFn: (row, columnId, filterValue: { years?: number[], months?: string[] }) => {
         const rowDate = new Date(row.getValue(columnId));
         const rowYear = rowDate.getFullYear();
-        return filterValue.includes(rowYear);
+        const rowMonth = rowDate.getMonth(); 
+        const hasYearMatch = !filterValue.years?.length || filterValue.years.includes(rowYear);
+        const numberArray: number[] = filterValue.months?.map(Number) || [];
+        const hasMonthMatch = !filterValue.months?.length || numberArray.includes(rowMonth);
+        return hasYearMatch && hasMonthMatch;
     },
+    
   },
   {
     accessorKey: "keterangan",
     header: "Keterangan",
+  },
+  {
+    accessorKey: "created_by",
+    header: "Pembuat",
   },
   {
     id: "actions",

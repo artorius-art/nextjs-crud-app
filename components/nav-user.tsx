@@ -1,5 +1,6 @@
 "use client"
 
+import { getUserName, signOut } from "@/app/action/auth"
 import {
   Avatar,
   AvatarFallback,
@@ -20,7 +21,10 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar"
+import { supabase } from "@/lib/supabase"
 import { EllipsisVerticalIcon, CircleUserRoundIcon, CreditCardIcon, BellIcon, LogOutIcon } from "lucide-react"
+import { useEffect, useState } from "react"
+import { Skeleton } from "./ui/skeleton"
 
 export function NavUser({
   user,
@@ -28,6 +32,31 @@ export function NavUser({
   user: any
 }) {
   const { isMobile } = useSidebar()
+  const [displayName, setDisplayName] = useState(null);
+  const [loading, setLoading] = useState(true);
+  useEffect(() => {
+    const fetchProfile = async () => {
+      if (!user?.id) return;
+
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('display_name')
+        .eq('id', user.id)
+        .single(); // Use .single() if you only expect one row
+
+      if (data) {
+        setDisplayName(data.display_name);
+      }
+      setLoading(false);
+    };
+
+    fetchProfile();
+  }, [user?.id]);
+  // const { data: result, error } = await supabase
+  //       .from('profiles')
+  //       .select('display_name')
+  //       .eq('id', user?.id);
+  const name = "Guest";
   return (
     <SidebarMenu>
       <SidebarMenuItem>
@@ -42,7 +71,11 @@ export function NavUser({
               <AvatarFallback className="rounded-lg">CN</AvatarFallback>
             </Avatar>
             <div className="grid flex-1 text-left text-sm leading-tight">
-              <span className="truncate font-medium">{user?.user_metadata?.display_name || "Guest User"}</span>
+              {loading ? 
+              (<Skeleton className="h-5 w-full" />) 
+              : <span className="truncate font-medium">{displayName || "Guest User"}</span>
+            }
+              
               {/* <span className="truncate font-medium">{user.name}</span> */}
               <span className="text-foreground/70 truncate text-xs">
                 {user.email}
@@ -64,7 +97,7 @@ export function NavUser({
                     <AvatarFallback className="rounded-lg">CN</AvatarFallback>
                   </Avatar>
                   <div className="grid flex-1 text-left text-sm leading-tight">
-                    <span className="truncate font-medium">{user?.user_metadata?.display_name || "Guest User"}</span>
+                    <span className="truncate font-medium">{displayName || "Guest User"}</span>
                     <span className="text-muted-foreground truncate text-xs">
                       {user.email}
                     </span>
@@ -91,7 +124,7 @@ export function NavUser({
               </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>
+            <DropdownMenuItem onClick={() => signOut()}>
               <LogOutIcon
               />
               Log out
