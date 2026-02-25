@@ -67,10 +67,9 @@ export default async function Page() {
       .select('display_name')
       .eq('id', user.id)
       .single();
-
-    display_name = data?.display_name ?? "";
+      if(data != null) display_name = data?.display_name ?? "";
   }
-
+  
   const data = await getData();
   // const data = await getData()
   // const nama = await getUserName()
