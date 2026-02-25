@@ -17,20 +17,7 @@ import {
 import { Baby, ChartBar, House, TreePalm } from "lucide-react"
 import { Card, CardContent } from "@/components/ui/card"
 import { createClient } from '@/utils/supabase/server'
-const supabaserver = await createClient()
-const { data: { user } } = await supabaserver.auth.getUser()
-async function getDataDummy(): Promise<Payment[]> {
-  // Fetch data from your API here.
-  return [
-    {
-      id: "728ed52f",
-      amount: 100,
-      status: "pending",
-      email: "m@example.com",
-    },
-    // ...
-  ]
-}
+
 // async function getData(): Promise<TabunganMaster[]> {
 //   try {
 //     const { data: result, error } = await supabase
@@ -52,26 +39,6 @@ async function getDataDummy(): Promise<Payment[]> {
 //     return []; 
 //   }
 // }
-async function getUserName() {
-  try {    
-    const { data, error } = await supabase
-        .from('profiles')
-        .select('display_name')
-        .eq('id', user?.id)
-        .single();
-    
-    if (error || !data) {
-      // console.error('Supabase Error:', error);
-      return null; // Return empty list so .map() doesn't crash in your UI
-    }
-
-    return data;
-    
-  } catch (err) {
-    // console.error('Unexpected Error:', err);
-    return null; 
-  }
-}
 async function getData() {
   const { data, error } = await supabase
     .from('tabungan_master')
