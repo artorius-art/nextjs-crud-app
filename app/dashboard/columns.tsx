@@ -89,8 +89,8 @@ export const columns: ColumnDef<TabunganMaster>[] = [
     header: "Keterangan",
   },
   {
-    accessorKey: "created_by",
-    header: "Pembuat",
+    accessorKey: "created_by_name",
+    header: "Dibuat oleh",
   },
   {
     id: "actions",

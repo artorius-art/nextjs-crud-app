@@ -1,4 +1,4 @@
-import { AppSidebar } from "@/components/app-sidebar"
+
 import { ChartAreaInteractive } from "@/components/chart-area-interactive"
 // import { DataTable } from "@/components/data-table"
 import { SectionCards } from "@/components/section-cards"
@@ -16,6 +16,9 @@ import {
 } from "@/components/ui/tabs"
 import { Baby, ChartBar, House, TreePalm } from "lucide-react"
 import { Card, CardContent } from "@/components/ui/card"
+import { createClient } from '@/utils/supabase/server'
+const supabaserver = await createClient()
+const { data: { user } } = await supabaserver.auth.getUser()
 async function getDataDummy(): Promise<Payment[]> {
   // Fetch data from your API here.
   return [
@@ -49,8 +52,30 @@ async function getData(): Promise<TabunganMaster[]> {
     return []; 
   }
 }
+async function getUserName() {
+  try {    
+    const { data, error } = await supabase
+        .from('profiles')
+        .select('display_name')
+        .eq('id', user?.id)
+        .single();
+    
+    if (error || !data) {
+      // console.error('Supabase Error:', error);
+      return null; // Return empty list so .map() doesn't crash in your UI
+    }
+
+    return data;
+    
+  } catch (err) {
+    // console.error('Unexpected Error:', err);
+    return null; 
+  }
+}
 export default async function Page() {
   const data = await getData()
+  const nama = await getUserName()
+  const display_name = nama != null ? nama?.display_name : null;
   return (
         <div className="flex flex-1 flex-col">
           <div className="@container/main flex flex-1 flex-col gap-2">
@@ -68,20 +93,20 @@ export default async function Page() {
                 </TabsList>
                 <TabsContent value="Anak">
                 <div className="">
-                    <DataTable columns={columns} data={data.filter(s => s.jenis === 'anak')} />
+                    <DataTable columns={columns} data={data.filter(s => s.jenis === 'Anak')} jenis={'Anak'} nama={display_name} />
                   </div>
                   
 
                 </TabsContent>
                 <TabsContent value="Rumah">
                   <div className="">
-                    <DataTable columns={columns} data={data.filter(s => s.jenis === 'rumah')} />
+                    <DataTable columns={columns} data={data.filter(s => s.jenis === 'Rumah')}  jenis={'Rumah'}nama={display_name}/>
                   </div>
 
                 </TabsContent>
                 <TabsContent value="Holiday">
                   <div className="">
-                    <DataTable columns={columns} data={data.filter(s => s.jenis === 'holiday')} />
+                    <DataTable columns={columns} data={data.filter(s => s.jenis === 'Holiday')}  jenis={'Holiday'}nama={display_name}/>
                   </div>
 
                 </TabsContent>

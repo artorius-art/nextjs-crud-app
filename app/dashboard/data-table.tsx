@@ -34,19 +34,25 @@ import {
   useComboboxAnchor,
 } from "@/components/ui/combobox"
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card"
+import { Building, Landmark } from "lucide-react"
+import { useRouter } from "next/navigation"
 
 
 
 
-interface DataTableProps<TData, TValue> {
+interface DataTableProps<TData, TValue, String> {
   columns: ColumnDef<TData, TValue>[]
   data: TData[]
+  jenis : string
+  nama : string
 }
 
-export function DataTable<TData, TValue>({
+export function DataTable<TData, TValue, String>({
   columns,
   data,
-}: DataTableProps<TData, TValue>) {
+  jenis,
+  nama
+}: DataTableProps<TData, TValue, String>) {
     const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     []
   )
@@ -93,6 +99,14 @@ const months = [
     const anchor2 = React.useRef(null);
 const lastValueRef = React.useRef<string[]>([]);
 const lastChangeTimeRef = React.useRef<number>(0);  
+const router = useRouter();
+  const handleClick = () => {
+    if (nama == null) {
+      router.push(`/dashboard/add-name?type=${jenis}`); 
+    } else {
+      router.push(`/dashboard/form?type=${jenis}`);
+    }
+  };
 return (
     <div>
 
@@ -215,7 +229,9 @@ return (
       </ComboboxContent>
   </Combobox>  
   </div>
-
+  <div className="w-full sm:w-1/2 max-w-xs float-right">
+  <Button size='lg' variant='default' onClick={handleClick}><Landmark/>Transaksi Tabungan {jenis}</Button>
+  </div>
   </div>
 
   <div className="overflow-hidden rounded-md border">

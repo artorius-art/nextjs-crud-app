@@ -41,6 +41,9 @@ export default function SignUp() {
             description: error.message,  position: "top-center" 
         })
     } else {
+      toast.success("Berhasil Mendaftar", {
+            description: "Silahkan buka email anda dan verifikasi melalui inbox dari Supabase",  position: "top-center" , duration:5000
+        })
       router.push('/auth/login')
     }
   }

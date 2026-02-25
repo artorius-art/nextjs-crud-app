@@ -34,7 +34,7 @@ export async function middleware(request: NextRequest) {
         .from('profiles')
         .select('display_name')
         .eq('id', user?.id);
-  console.log(result);
+  // console.log(result);
   // Redirect root to dashboard
   if (request.nextUrl.pathname === '/') {
     return NextResponse.redirect(new URL('/dashboard', request.url))

@@ -155,22 +155,22 @@ const data = {
         />
       ),
     },
-    {
-      name: "Tabungan",
-      url: "/dashboard/tabungan",
-      icon: (
-        <Banknote
-        />
-      ),
-    },
-    {
-      name: "Word Assistant",
-      url: "#",
-      icon: (
-        <FileIcon
-        />
-      ),
-    },
+    // {
+    //   name: "Tabungan",
+    //   url: "/dashboard/tabungan",
+    //   icon: (
+    //     <Banknote
+    //     />
+    //   ),
+    // },
+    // {
+    //   name: "Word Assistant",
+    //   url: "#",
+    //   icon: (
+    //     <FileIcon
+    //     />
+    //   ),
+    // },
   ],
 }
 export function AppSidebar({ user, ...props }:{ user: any } & React.ComponentProps<typeof Sidebar>) {
@@ -184,7 +184,7 @@ export function AppSidebar({ user, ...props }:{ user: any } & React.ComponentPro
               render={<a href="#" />}
             >
               <CommandIcon className="size-5!" />
-              <span className="text-base font-semibold">Acme Inc.</span>
+              <span className="text-base font-semibold">Arinarka Inc.</span>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
