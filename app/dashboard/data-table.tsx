@@ -44,7 +44,7 @@ interface DataTableProps<TData, TValue, String> {
   columns: ColumnDef<TData, TValue>[]
   data: TData[]
   jenis : string
-  nama : string
+  nama : string | null
 }
 
 export function DataTable<TData, TValue, String>({

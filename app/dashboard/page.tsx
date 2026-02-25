@@ -31,27 +31,27 @@ async function getDataDummy(): Promise<Payment[]> {
     // ...
   ]
 }
-async function getData(): Promise<TabunganMaster[]> {
-  try {
-    const { data: result, error } = await supabase
-      .from('tabungan_master')
-      .select('*')
-      .eq('is_active', true)
-      .order('date', { ascending: false });
+// async function getData(): Promise<TabunganMaster[]> {
+//   try {
+//     const { data: result, error } = await supabase
+//       .from('tabungan_master')
+//       .select('*')
+//       .eq('is_active', true)
+//       .order('date', { ascending: false });
 
     
-    if (error || !result) {
-      console.error('Supabase Error:', error);
-      return []; // Return empty list so .map() doesn't crash in your UI
-    }
+//     if (error || !result) {
+//       console.error('Supabase Error:', error);
+//       return []; // Return empty list so .map() doesn't crash in your UI
+//     }
 
-    return result as TabunganMaster[];
+//     return result as TabunganMaster[];
     
-  } catch (err) {
-    console.error('Unexpected Error:', err);
-    return []; 
-  }
-}
+//   } catch (err) {
+//     console.error('Unexpected Error:', err);
+//     return []; 
+//   }
+// }
 async function getUserName() {
   try {    
     const { data, error } = await supabase
@@ -72,10 +72,39 @@ async function getUserName() {
     return null; 
   }
 }
+async function getData() {
+  const { data, error } = await supabase
+    .from('tabungan_master')
+    .select('*')
+    .eq('is_active', true)
+    .order('date', { ascending: false });
+
+  if (error || !data) return [];
+  return data;
+}
 export default async function Page() {
-  const data = await getData()
-  const nama = await getUserName()
-  const display_name = nama != null ? nama?.display_name : null;
+  const supabaserver = await createClient();
+
+  const {
+    data: { user },
+  } = await supabaserver.auth.getUser();
+
+  let display_name: string | null = null;
+
+  if (user) {
+    const { data } = await supabaserver
+      .from('profiles')
+      .select('display_name')
+      .eq('id', user.id)
+      .single();
+
+    display_name = data?.display_name ?? "";
+  }
+
+  const data = await getData();
+  // const data = await getData()
+  // const nama = await getUserName()
+  // const display_name = nama != null ? nama?.display_name : null;
   return (
         <div className="flex flex-1 flex-col">
           <div className="@container/main flex flex-1 flex-col gap-2">
