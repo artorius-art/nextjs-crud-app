@@ -9,34 +9,74 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
-import { TrendingUpIcon, TrendingDownIcon, Baby, BabyIcon, House, TreePalm, Banknote } from "lucide-react"
-import { useEffect, useState } from "react"
-import { supabase } from "@/lib/supabase"
+import { TrendingUpIcon, TrendingDownIcon, Baby, BabyIcon, House, TreePalm, Banknote, MilestoneIcon } from "lucide-react"
+// import { useEffect, useState } from "react"
+// import { supabase } from "@/lib/supabase"
+type Props = {
+  allData: any[]
+}
 
-export function SectionCards() {
+export function SectionCards({ allData = [] }: Props) {
+  const now = new Date()
+  const currentMonth = now.getMonth()
+  const currentYear = now.getFullYear()
 
-  const [allData, setAllData] = useState<any[]>([])
-  const fetchAllData = async () => {
-    try {
-      const { data: result, error } = await supabase
-        .from('tabungan_master')
-        .select('*')
-        .eq('is_active', true)
-        .order('date', { ascending: false })
+  const lastMonthDate = new Date(currentYear, currentMonth - 1)
+  const lastMonth = lastMonthDate.getMonth()
+  const lastMonthYear = lastMonthDate.getFullYear()
+  const getMonthlyDiff = (jenis?: string | null) => {
+    const calculateTotal = (month: number, year: number) => {
+      return allData
+        .filter(item => {
+          const d = new Date(item.date);
+          const matchesDate = d.getMonth() === month && d.getFullYear() === year;
+          const matchesJenis = !jenis || item.jenis === jenis;
+          
+          return matchesDate && matchesJenis;
+        })
+        .reduce((sum, item) => sum + item.nominal, 0);
+    };
 
-      if (error) {
-        console.error('Error fetching all data:', error)
-      } else {
-        // console.log(result)
-        setAllData(result || [])
-      }
-    } catch (error) {
-      console.error('Error:', error)
-    }
-  }
-  useEffect(() => {
-    fetchAllData()
-  }, [])
+    const currentTotal = calculateTotal(currentMonth, currentYear);
+    const lastTotal = calculateTotal(lastMonth, lastMonthYear);
+
+    return currentTotal - lastTotal;
+  };
+const diffAnak = getMonthlyDiff("Anak")
+const diffRumah = getMonthlyDiff("Rumah")
+const diffHoli = getMonthlyDiff("Holiday")
+const diffTot = getMonthlyDiff(null)
+const isUp = diffAnak > 0 
+const isDown = diffAnak < 0 
+const isUpR = diffRumah > 0 
+const isDownR = diffRumah < 0 
+const isUpH = diffHoli > 0 
+const isDownH = diffHoli < 0 
+const isUpT = diffTot > 0 
+const isDownT = diffTot < 0 
+
+  // const [allData, setAllData] = useState<any[]>([])
+  // const fetchAllData = async () => {
+  //   try {
+  //     const { data: result, error } = await supabase
+  //       .from('tabungan_master')
+  //       .select('*')
+  //       .eq('is_active', true)
+  //       .order('date', { ascending: false })
+
+  //     if (error) {
+  //       console.error('Error fetching all data:', error)
+  //     } else {
+  //       // console.log(result)
+  //       setAllData(result || [])
+  //     }
+  //   } catch (error) {
+  //     console.error('Error:', error)
+  //   }
+  // }
+  // useEffect(() => {
+  //   fetchAllData()
+  // }, [])
   return (
     <div className="*:data-[slot=card]:from-primary/5 *:data-[slot=card]:to-card dark:*:data-[slot=card]:bg-card grid grid-cols-1 gap-4 px-4 *:data-[slot=card]:bg-linear-to-t *:data-[slot=card]:shadow-xs lg:px-6 @xl/main:grid-cols-2 @5xl/main:grid-cols-4">
       <Card className="@container/card">
@@ -51,14 +91,35 @@ export function SectionCards() {
           </CardAction>
         </CardHeader>
         <CardFooter className="flex-col items-start gap-1.5 text-sm">
-          <div className="line-clamp-1 flex gap-2 font-medium">
-            Trending up this month{" "}
-            <TrendingUpIcon className="size-4" />
-          </div>
-          <div className="text-muted-foreground">
-            Visitors for the last 6 months
-          </div>
-        </CardFooter>
+          <div className="flex items-center gap-2 font-medium">
+            Tabungan bulan ini
+              {isUp  ? (
+              <>
+                  <Badge className="bg-green-50 text-green-700 dark:bg-green-950 dark:text-green-300">
+                    <TrendingUpIcon/>Rp {Math.abs(diffAnak).toLocaleString("id-ID")}
+                </Badge>
+              </>
+              ) : isDown ? (
+                              <>
+                  <Badge variant="destructive">
+                    <TrendingDownIcon/>Rp {Math.abs(diffAnak).toLocaleString("id-ID")}
+                </Badge>
+              </>
+              ) : (<>
+                  <Badge>
+                    <MilestoneIcon/>Tetap
+                </Badge>
+              </>)}
+              {/* <span className={isUp ? "text-green-600" : "text-red-600"}>
+                {isUp ? "Naik" : "Turun"} Rp{" "}
+                {Math.abs(diffAnak).toLocaleString("id-ID")}
+              </span> */}
+            </div>
+
+            <span className="text-muted-foreground">
+              dibanding bulan lalu
+            </span>        
+          </CardFooter>
       </Card>
       <Card className="@container/card">
         <CardHeader>
@@ -72,14 +133,35 @@ export function SectionCards() {
           </CardAction>
         </CardHeader>
         <CardFooter className="flex-col items-start gap-1.5 text-sm">
-          <div className="line-clamp-1 flex gap-2 font-medium">
-            Down 20% this period{" "}
-            <TrendingDownIcon className="size-4" />
-          </div>
-          <div className="text-muted-foreground">
-            Acquisition needs attention
-          </div>
-        </CardFooter>
+          <div className="flex items-center gap-2 font-medium">
+            Tabungan bulan ini
+              {isUpR  ? (
+              <>
+                  <Badge className="bg-green-50 text-green-700 dark:bg-green-950 dark:text-green-300">
+                    <TrendingUpIcon/>Rp {Math.abs(diffRumah).toLocaleString("id-ID")}
+                </Badge>
+              </>
+              ) : isDownR ? (
+                              <>
+                  <Badge variant="destructive">
+                    <TrendingDownIcon/>Rp {Math.abs(diffRumah).toLocaleString("id-ID")}
+                </Badge>
+              </>
+              ) : (<>
+                  <Badge>
+                    <MilestoneIcon/>Tetap
+                </Badge>
+              </>)}
+              {/* <span className={isUp ? "text-green-600" : "text-red-600"}>
+                {isUp ? "Naik" : "Turun"} Rp{" "}
+                {Math.abs(diffAnak).toLocaleString("id-ID")}
+              </span> */}
+            </div>
+
+            <span className="text-muted-foreground">
+              dibanding bulan lalu
+            </span>        
+          </CardFooter>
       </Card>
       <Card className="@container/card">
         <CardHeader>
@@ -93,12 +175,35 @@ export function SectionCards() {
           </CardAction>
         </CardHeader>
         <CardFooter className="flex-col items-start gap-1.5 text-sm">
-          <div className="line-clamp-1 flex gap-2 font-medium">
-            Strong user retention{" "}
-            <TrendingUpIcon className="size-4" />
-          </div>
-          <div className="text-muted-foreground">Engagement exceed targets</div>
-        </CardFooter>
+          <div className="flex items-center gap-2 font-medium">
+            Tabungan bulan ini
+              {isUpH  ? (
+              <>
+                  <Badge className="bg-green-50 text-green-700 dark:bg-green-950 dark:text-green-300">
+                    <TrendingUpIcon/>Rp {Math.abs(diffHoli).toLocaleString("id-ID")}
+                </Badge>
+              </>
+              ) : isDownH ? (
+                              <>
+                  <Badge variant="destructive">
+                    <TrendingDownIcon/>Rp {Math.abs(diffHoli).toLocaleString("id-ID")}
+                </Badge>
+              </>
+              ) : (<>
+                  <Badge>
+                    <MilestoneIcon/>Tetap
+                </Badge>
+              </>)}
+              {/* <span className={isUp ? "text-green-600" : "text-red-600"}>
+                {isUp ? "Naik" : "Turun"} Rp{" "}
+                {Math.abs(diffAnak).toLocaleString("id-ID")}
+              </span> */}
+            </div>
+
+            <span className="text-muted-foreground">
+              dibanding bulan lalu
+            </span>        
+          </CardFooter>
       </Card>
       <Card className="@container/card">
         <CardHeader>
@@ -112,12 +217,35 @@ export function SectionCards() {
           </CardAction>
         </CardHeader>
         <CardFooter className="flex-col items-start gap-1.5 text-sm">
-          <div className="line-clamp-1 flex gap-2 font-medium">
-            Steady performance increase{" "}
-            <TrendingUpIcon className="size-4" />
-          </div>
-          <div className="text-muted-foreground">Meets growth projections</div>
-        </CardFooter>
+          <div className="flex items-center gap-2 font-medium">
+            Tabungan bulan ini
+              {isUpT  ? (
+              <>
+                  <Badge className="bg-green-50 text-green-700 dark:bg-green-950 dark:text-green-300">
+                    <TrendingUpIcon/>Rp {Math.abs(diffTot).toLocaleString("id-ID")}
+                </Badge>
+              </>
+              ) : isDownT ? (
+                              <>
+                  <Badge variant="destructive">
+                    <TrendingDownIcon/>Rp {Math.abs(diffTot).toLocaleString("id-ID")}
+                </Badge>
+              </>
+              ) : (<>
+                  <Badge>
+                    <MilestoneIcon/>Tetap
+                </Badge>
+              </>)}
+              {/* <span className={isUp ? "text-green-600" : "text-red-600"}>
+                {isUp ? "Naik" : "Turun"} Rp{" "}
+                {Math.abs(diffAnak).toLocaleString("id-ID")}
+              </span> */}
+            </div>
+
+            <span className="text-muted-foreground">
+              dibanding bulan lalu
+            </span>        
+          </CardFooter>
       </Card>
     </div>
   )

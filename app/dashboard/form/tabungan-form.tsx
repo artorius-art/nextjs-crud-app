@@ -5,7 +5,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { TabunganInput, tabunganSchema, type TabunganValues } from "@/lib/schema";
 import { createClient } from "@/utils/supabase/client";
 import { useRouter } from "next/navigation";
-import { Loader2, Pencil, Save } from "lucide-react";
+import { BanknoteArrowDownIcon, BanknoteArrowUpIcon, Loader2, Pencil, Save } from "lucide-react";
 // Base UI components (adjust paths based on your actual filenames)
 import { Input } from "@/components/ui/input"; 
 import { Button, buttonVariants } from "@/components/ui/button";
@@ -23,13 +23,27 @@ import { toast, Toaster } from "sonner";
 export function TabunganForm({
   initialData,
   type,
+  mode,
 }: {
   initialData?: TabunganValues & { id: number };
   type?: string;
+  mode?: string;
 }) {
   const router = useRouter();
   const supabase = createClient();
-  
+  const isViewMode = mode === "view";
+  const formatLocalDate = (date: Date) => {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+
+  return `${year}-${month}-${day}`;
+};
+
+const parseLocalDate = (dateString: string) => {
+  const [year, month, day] = dateString.split("-").map(Number);
+  return new Date(year, month - 1, day);
+};
 const {
   register,
   handleSubmit,
@@ -41,7 +55,7 @@ const {
     jenis: type ?? "",
     nominal: 0,
     keterangan: "",
-    date: new Date().toISOString().split("T")[0],
+    date: formatLocalDate(new Date()),
     is_pemasukan: true,
   },
 });
@@ -161,6 +175,7 @@ const onSubmit = async (data: TabunganValues) => {
                         }).format(Number(field.value))
                       : ""
                   }
+                  readOnly={isViewMode}
                   onChange={(e) => {
                     const raw = e.target.value.replace(/\D/g, "");
                     field.onChange(raw ? Number(raw) : 0);
@@ -195,20 +210,20 @@ const onSubmit = async (data: TabunganValues) => {
           > */}
             <CalendarIcon className="mr-2 h-4 w-4" />
             {field.value
-              ? format(new Date(field.value), "dd MMMM yyyy")
+              ? format(parseLocalDate(field.value), "dd MMMM yyyy")
               : "Pilih Tanggal"}
           {/* </Button> */}
         </PopoverTrigger>
 
         <PopoverContent className="w-auto p-0">
-          <Calendar
+          <Calendar disabled={isViewMode}
             mode="single"
-            selected={field.value ? new Date(field.value) : undefined}
-            onSelect={(date) =>
-              field.onChange(
-                date ? date.toISOString().split("T")[0] : ""
-              )
-            }
+            selected={field.value ? parseLocalDate(field.value) : undefined}
+            onSelect={(date) => {
+              if (!date) return field.onChange("");
+
+              field.onChange(formatLocalDate(date));
+            }}            
             initialFocus
           />
         </PopoverContent>
@@ -239,37 +254,45 @@ const onSubmit = async (data: TabunganValues) => {
                 <div className="grid grid-cols-2 gap-3">
                   {/* Pemasukan */}
                   <div
-                    onClick={() => field.onChange(true)}
-                    className={`cursor-pointer rounded-lg border p-3 text-center text-sm font-medium transition-all
+                    onClick={() => !isViewMode && field.onChange(true)}
+                    className={`group flex cursor-pointer items-center justify-center gap-2 rounded-xl border px-4 py-3 text-sm font-semibold transition-all duration-200
                       ${
                         field.value === true
-                          ? "border-green-600 bg-background text-green-700 ring-2 ring-green-600"
-                          : "border-muted hover:border-green-400"
+                          ? "border-green-600 bg-secondary text-green-700 ring-2 ring-green-600"
+                          : "border-muted hover:border-green-400 hover:bg-secondary"
                       }
                     `}
                   >
-                    Pemasukan
+                    <BanknoteArrowUpIcon className={`h-8 w-8 transition-transform duration-200 ${
+                        field.value === false ? "scale-110" : "group-hover:scale-110"
+                      }`}/><span>Pemasukan</span>
                   </div>
 
                   {/* Pengeluaran */}
                   <div
-                    onClick={() => field.onChange(false)}
-                    className={`cursor-pointer rounded-lg border p-3 text-center text-sm font-medium transition-all
+                    onClick={() => !isViewMode && field.onChange(false)}
+                    className={`group flex cursor-pointer items-center justify-center gap-2 rounded-xl border px-4 py-3 text-sm font-semibold transition-all duration-200
                       ${
                         field.value === false
-                          ? "border-red-600 bg-background text-red-700 ring-2 ring-red-600"
-                          : "border-muted hover:border-red-400"
+                          ? "border-red-600 bg-secondary text-red-700 ring-2 ring-red-600 shadow-sm "
+                          : "border-muted bg-card hover:border-red-400 hover:bg-secondary "
                       }
+                      ${isViewMode ? "pointer-events-none opacity-60" : ""}
                     `}
                   >
-                    Pengeluaran
+                    <BanknoteArrowDownIcon
+                      className={`h-8 w-8 transition-transform duration-200 ${
+                        field.value === false ? "scale-110" : "group-hover:scale-110"
+                      }`}
+                    />
+                    <span>Pengeluaran</span>
                   </div>
                 </div>
               </div>
             )}
           />          
           </CardContent>
-    
+    {!isViewMode && (
           <CardFooter>
             <Button type="submit" disabled={isSubmitting} className="w-full">
     {isSubmitting ? (
@@ -288,6 +311,7 @@ const onSubmit = async (data: TabunganValues) => {
     )}
   </Button>
           </CardFooter>
+          )}
         </form>
       </Card>
   );

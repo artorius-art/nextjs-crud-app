@@ -1,4 +1,5 @@
-
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
 import { ChartAreaInteractive } from "@/components/chart-area-interactive"
 // import { DataTable } from "@/components/data-table"
 import { SectionCards } from "@/components/section-cards"
@@ -7,7 +8,7 @@ import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar"
 import { columns, Payment, TabunganMaster } from "./columns"
 import { DataTable } from "./data-table"
 import data from "./data.json"
-import { supabase } from "@/lib/supabase"
+// import { supabase } from "@/lib/supabase"
 import {
   Tabs,
   TabsContent,
@@ -17,7 +18,6 @@ import {
 import { Baby, ChartBar, House, TreePalm } from "lucide-react"
 import { Card, CardContent } from "@/components/ui/card"
 import { createClient } from '@/utils/supabase/server'
-
 // async function getData(): Promise<TabunganMaster[]> {
 //   try {
 //     const { data: result, error } = await supabase
@@ -40,15 +40,18 @@ import { createClient } from '@/utils/supabase/server'
 //   }
 // }
 async function getData() {
+  const supabase = await createClient()
+
   const { data, error } = await supabase
     .from('tabungan_master')
     .select('*')
     .eq('is_active', true)
-    .order('date', { ascending: false });
+    .order('date', { ascending: false })
 
-  if (error || !data) return [];
-  return data;
+  if (error || !data) return []
+  return data
 }
+
 export default async function Page() {
   const supabaserver = await createClient();
 
@@ -76,7 +79,7 @@ export default async function Page() {
         <div className="flex flex-1 flex-col">
           <div className="@container/main flex flex-1 flex-col gap-2">
             <div className="flex flex-col gap-4 py-4 md:gap-6 md:py-6">
-              <SectionCards />
+              <SectionCards  allData={data}/>
               {/* <div className="px-4 lg:px-6">
                 <ChartAreaInteractive />
               </div> */}
@@ -107,7 +110,7 @@ export default async function Page() {
 
                 </TabsContent>
                 <TabsContent value="Statistik">
-                  <ChartAreaInteractive />
+                  <ChartAreaInteractive allData={data} />
 
                 </TabsContent>
               </Tabs>
