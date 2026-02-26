@@ -1,7 +1,7 @@
 "use client"
 import { cn } from "@/lib/utils"
 import { ColumnDef } from "@tanstack/react-table"
-import { BanknoteArrowDown, BanknoteArrowUp, Eye, MoreHorizontal, Pencil, Trash2, Trash2Icon, X } from "lucide-react"
+import { BanknoteArrowDown, BanknoteArrowUp, Eye, File, FileImageIcon, MoreHorizontal, Pencil, Trash2, Trash2Icon, X } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import {
   DropdownMenu,
@@ -139,6 +139,7 @@ export type TabunganMaster = {
   created_by: string | null
   is_pemasukan: boolean
   created_by_name: string | null
+  bukti_url: string | null
 }
 export const columns: ColumnDef<TabunganMaster>[] = [
   {
@@ -148,6 +149,8 @@ export const columns: ColumnDef<TabunganMaster>[] = [
         const amount = parseFloat(row.getValue("nominal"))
         const rowDate = new Date(row.getValue("date"));
         const rowKeterangan = String(row.getValue("keterangan") ?? "");
+        const rowUrl = String(row.getValue("bukti_url") ?? "");
+        const isHasAtt = rowUrl != "";
         const formatted = new Intl.NumberFormat("id-ID", {
             style: "currency",
             currency: "IDR",
@@ -161,16 +164,20 @@ export const columns: ColumnDef<TabunganMaster>[] = [
                   variant={
                     isPemasukan ? "default" : "destructive"}
                   className = {
-                    isPemasukan ? "bg-green-50 text-green-700 dark:bg-green-950 dark:text-green-300" : ""}
+                    isPemasukan ? "bg-green-50 text-green-700 dark:bg-green-950 dark:text-green-300 py-3" : "py-3"}
                   >
-                  <div className="font-bold text-xl"> {formatted}</div>
+                  <div className="font-bold text-xl"> {formatted}
+                   
+                    
+                    </div>
                 </Badge>
-                <div className="text-muted-foreground text-sm">{rowDate.toLocaleDateString("id-ID", {
+                <div className="flex items-center gap-2 text-muted-foreground text-sm">{rowDate.toLocaleDateString("id-ID", {
                 day: "numeric",
                 month: "long",
                 year: "numeric",
-                })}
+                })}  {isHasAtt && <FileImageIcon className="text-primary" size={16} />}
                 </div>
+                
                 {rowKeterangan ? (
                   <blockquote className="mt-6 border-l-2 pl-6 italic">
                     &quot;{rowKeterangan}&quot;
@@ -199,6 +206,10 @@ export const columns: ColumnDef<TabunganMaster>[] = [
   {
     accessorKey: "keterangan",
     header: "Keterangan",
+  },
+  {
+    accessorKey: "bukti_url",
+    header: "Attachment",
   },
   {
     accessorKey: "created_by_name",

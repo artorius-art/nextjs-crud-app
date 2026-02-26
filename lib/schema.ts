@@ -14,6 +14,7 @@ export const tabunganSchema = z.object({
   keterangan: z.string().nullable().optional(),
   date: z.string().min(1, "Tanggal harus diisi"),
   is_pemasukan: z.boolean().default(true),
+  bukti_url: z.string().nullable().optional(),
 });
 
 export type TabunganValues = z.infer<typeof tabunganSchema>;

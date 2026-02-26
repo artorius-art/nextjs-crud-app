@@ -5,7 +5,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { TabunganInput, tabunganSchema, type TabunganValues } from "@/lib/schema";
 import { createClient } from "@/utils/supabase/client";
 import { useRouter } from "next/navigation";
-import { BanknoteArrowDownIcon, BanknoteArrowUpIcon, Loader2, Pencil, Save } from "lucide-react";
+import { BanknoteArrowDownIcon, BanknoteArrowUpIcon, Loader2, Pencil, Save, Trash, TrashIcon, UploadCloud } from "lucide-react";
 // Base UI components (adjust paths based on your actual filenames)
 import { Input } from "@/components/ui/input"; 
 import { Button, buttonVariants } from "@/components/ui/button";
@@ -20,6 +20,8 @@ import { format } from "date-fns";
 import { CalendarIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { toast, Toaster } from "sonner";
+import React, { useEffect, useState } from "react";
+import Image from "next/image";
 export function TabunganForm({
   initialData,
   type,
@@ -29,6 +31,48 @@ export function TabunganForm({
   type?: string;
   mode?: string;
 }) {
+const fileInputRef = React.useRef<HTMLInputElement | null>(null)
+
+const handleClick = () => {
+  fileInputRef.current?.click()
+}
+
+  const [imageFile, setImageFile] = React.useState<File | null>(null)
+  const [previewUrl, setPreviewUrl] = React.useState<string | null>(null)
+  const [uploading, setUploading] = React.useState(false)
+  const [removeExistingImage, setRemoveExistingImage] = useState(false)
+  const [existingImageUrl, setExistingImageUrl] = useState<string | null>(null)
+
+  useEffect(() => {
+    if (!initialData?.bukti_url) {
+      setExistingImageUrl(null)
+      return
+    }
+
+    const { data: urlData } = supabase.storage
+      .from("tabungan-bucket")
+      .getPublicUrl(initialData.bukti_url)
+
+    setExistingImageUrl(urlData.publicUrl)
+  }, [initialData?.bukti_url])
+  const imageToShow = previewUrl
+  ? previewUrl
+  : removeExistingImage
+  ? null
+  : existingImageUrl
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+
+    // Validate image
+    if (!file.type.startsWith("image/")) {
+      alert("Silahkan pilih gambar")
+      return
+    }
+
+    setImageFile(file)
+    setPreviewUrl(URL.createObjectURL(file))
+  }
   const router = useRouter();
   const supabase = createClient();
   const isViewMode = mode === "view";
@@ -59,6 +103,9 @@ const {
     is_pemasukan: true,
   },
 });
+  const { data } = supabase.storage
+    .from("tabungan-bucket")
+    .getPublicUrl(initialData?.bukti_url || "")
 
 const onSubmit = async (data: TabunganValues) => {
   const {
@@ -70,6 +117,7 @@ const onSubmit = async (data: TabunganValues) => {
     alert("User not authenticated");
     return;
   }
+  setUploading(true)
 
   // Get display_name from profiles
   const { data: profile, error: profileError } = await supabase
@@ -90,6 +138,40 @@ const onSubmit = async (data: TabunganValues) => {
       : -Math.abs(data.nominal),
   };
 
+
+  let finalImagePath = data?.bukti_url || null
+
+  // 1️⃣ If user removed old image
+  if (removeExistingImage && data?.bukti_url) {
+    await supabase.storage
+      .from("tabungan-bucket")
+      .remove([data.bukti_url])
+
+    finalImagePath = null
+  }
+  if (imageFile) {
+    if (data?.bukti_url) {
+      await supabase.storage
+        .from("tabungan-bucket")
+        .remove([data.bukti_url])
+    }
+
+    const fileExt = imageFile.name.split(".").pop()
+    const filePath = `${user.id}/${crypto.randomUUID()}.${fileExt}`
+
+    const { error: uploadError } = await supabase.storage
+      .from("tabungan-bucket")
+      .upload(filePath, imageFile)
+
+    if (uploadError) {
+      alert(uploadError.message)
+      setUploading(false)
+      return
+    }
+
+    finalImagePath = filePath
+  }
+
   if (initialData) {
     // UPDATE
     const { error } = await supabase
@@ -98,6 +180,7 @@ const onSubmit = async (data: TabunganValues) => {
         ...finalData,
         modified_at: new Date().toISOString(),
         modified_by: user.email,
+        bukti_url:finalImagePath,
       })
       .eq("id", initialData.id);
 
@@ -117,11 +200,13 @@ const onSubmit = async (data: TabunganValues) => {
         ...finalData,
         created_by: user.email,
         created_by_name: profile?.display_name ?? "",
+        bukti_url: finalImagePath
       },
     ]);
 
     if (error) {
       alert(error.message);
+      setUploading(false)
       return;
     }
 
@@ -130,7 +215,7 @@ const onSubmit = async (data: TabunganValues) => {
       position: "top-center",
     });
   }
-
+    setUploading(false)
     router.replace("/dashboard");
 };
   return (
@@ -166,6 +251,7 @@ const onSubmit = async (data: TabunganValues) => {
                 <Input
                   type="text"
                   inputMode="numeric"
+                  placeholder="Masukan Nominal"
                   value={
                     field.value
                       ? new Intl.NumberFormat("id-ID", {
@@ -240,7 +326,7 @@ const onSubmit = async (data: TabunganValues) => {
           {/* Keterangan Field */}
           <div className="flex flex-col gap-1">
             <label className="text-sm font-medium">Keterangan</label>
-            <Textarea {...register("keterangan")} placeholder="Masukan Keterangan" />
+            <Textarea readOnly={isViewMode} {...register("keterangan")} placeholder="Masukan Keterangan" />
           </div>
 
           {/* Pemasukan Toggle (Using Controller for Custom Components) */}
@@ -249,7 +335,7 @@ const onSubmit = async (data: TabunganValues) => {
             name="is_pemasukan"
             render={({ field }) => (
               <div className="flex flex-col gap-2 mb-8">
-                <label className="text-sm font-medium">Tipe Transaksi</label>
+                <label className="text-sm font-medium">Pilih Tipe Transaksi</label>
 
                 <div className="grid grid-cols-2 gap-3">
                   {/* Pemasukan */}
@@ -258,7 +344,7 @@ const onSubmit = async (data: TabunganValues) => {
                     className={`group flex cursor-pointer items-center justify-center gap-2 rounded-xl border px-4 py-3 text-sm font-semibold transition-all duration-200
                       ${
                         field.value === true
-                          ? "border-green-600 bg-secondary text-green-700 ring-2 ring-green-600"
+                          ? "border-green-600 bg-secondary text-green-600 ring-2 ring-green-600"
                           : "border-muted hover:border-green-400 hover:bg-secondary"
                       }
                     `}
@@ -267,14 +353,14 @@ const onSubmit = async (data: TabunganValues) => {
                         field.value === false ? "scale-110" : "group-hover:scale-110"
                       }`}/><span>Pemasukan</span>
                   </div>
-
+                      
                   {/* Pengeluaran */}
                   <div
                     onClick={() => !isViewMode && field.onChange(false)}
                     className={`group flex cursor-pointer items-center justify-center gap-2 rounded-xl border px-4 py-3 text-sm font-semibold transition-all duration-200
                       ${
                         field.value === false
-                          ? "border-red-600 bg-secondary text-red-700 ring-2 ring-red-600 shadow-sm "
+                          ? " border-destructive bg-secondary text-destructive ring-2 ring-destructive  shadow-sm "
                           : "border-muted bg-card hover:border-red-400 hover:bg-secondary "
                       }
                       ${isViewMode ? "pointer-events-none opacity-60" : ""}
@@ -290,11 +376,74 @@ const onSubmit = async (data: TabunganValues) => {
                 </div>
               </div>
             )}
-          />          
+          />      
+
+        
+<div className="space-y-3">
+  {imageToShow ? (
+    <div className="relative group">
+      <Image width={600}
+  height={400}
+        src={imageToShow}
+        alt="Bukti"
+        className={`h-auto w-full rounded-xl object-cover border transition ${
+          !isViewMode ? "cursor-pointer group-hover:opacity-80" : ""
+        }`}
+        onClick={!isViewMode ? handleClick : undefined}
+      />
+
+      {/* REMOVE BUTTON (EDIT MODE ONLY) */}
+      {!isViewMode && (
+        <Button
+          type="button"
+          size="sm"
+          onClick={(e) => {
+            e.stopPropagation()
+            setPreviewUrl(null)
+            setImageFile(null)
+            setRemoveExistingImage(true)
+          }}          
+          className="absolute top-2 right-2 bg-destructive/80 hover:bg-destructive text-white"
+        >
+          <TrashIcon className="h-4 w-4 mr-1" />
+          Hapus
+        </Button>
+      )}
+    </div>
+  ) : (
+    !isViewMode && (
+      <div
+        onClick={handleClick}
+        className="group flex cursor-pointer flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed border-muted-foreground/30 bg-muted/20 p-2 text-center transition-all duration-200 hover:scale-[1.01] hover:border-primary hover:bg-muted/40"
+      >
+        <UploadCloud className="h-8 w-8 text-muted-foreground transition-colors group-hover:text-primary" />
+
+        <p className="text-sm font-medium">
+          Upload bukti lampiran (opsional)
+        </p>
+
+        <p className="text-xs text-muted-foreground">
+          PNG, JPG up to 5MB
+        </p>
+      </div>
+    )
+  )}
+
+  {/* Hidden Input (only in edit mode) */}
+  {!isViewMode && (
+    <input
+      ref={fileInputRef}
+      type="file"
+      accept="image/*"
+      onChange={handleImageChange}
+      className="hidden"
+    />
+  )}
+</div>
           </CardContent>
     {!isViewMode && (
-          <CardFooter>
-            <Button type="submit" disabled={isSubmitting} className="w-full">
+          <CardFooter className="mt-3">
+            <Button type="submit" disabled={isSubmitting} size={'lg'} className="w-full">
     {isSubmitting ? (
       <span className="flex items-center gap-2">
         <Loader2 className="h-4 w-4 animate-spin" />

@@ -70,6 +70,7 @@ export function DataTable<TData, TValue, String>({
     columnVisibility: {
       date: false, // The key must match the accessorKey "date"
       keterangan: false, // The key must match the accessorKey "date"
+      bukti_url: false, // The key must match the accessorKey "date"
     },
   },
   })

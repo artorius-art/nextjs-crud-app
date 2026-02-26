@@ -9,12 +9,19 @@ import { columns, Payment, TabunganMaster } from "./columns"
 import { DataTable } from "./data-table"
 import data from "./data.json"
 // import { supabase } from "@/lib/supabase"
+// import {
+//   Tabs,
+//   TabsContent,
+//   TabsList,
+//   TabsTrigger,
+// } from "@/components/ui/tabs"
 import {
   Tabs,
   TabsContent,
+  TabsContents,
   TabsList,
   TabsTrigger,
-} from "@/components/ui/tabs"
+} from '@/components/animate-ui/components/animate/tabs';
 import { Baby, ChartBar, House, TreePalm } from "lucide-react"
 import { Card, CardContent } from "@/components/ui/card"
 import { createClient } from '@/utils/supabase/server'
@@ -89,6 +96,7 @@ export default async function Page() {
                   <TabsTrigger value="Holiday"><TreePalm />Holiday</TabsTrigger>
                   <TabsTrigger value="Statistik"><ChartBar/>Statistik</TabsTrigger>
                 </TabsList>
+                <TabsContents>
                 <TabsContent value="Anak">
                 <div className="">
                     <DataTable columns={columns} data={data.filter(s => s.jenis === 'Anak')} jenis={'Anak'} nama={display_name} />
@@ -112,6 +120,7 @@ export default async function Page() {
                   <ChartAreaInteractive allData={data} />
 
                 </TabsContent>
+                </TabsContents>
               </Tabs>
               
               {/* <DataTable data={data} /> */}

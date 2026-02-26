@@ -34,16 +34,17 @@ import { BabyIcon, Banknote, House, TreePalm } from "lucide-react"
 export const description = "An interactive area chart"
 
 const chartConfig = {
-  visitors: {
-    label: "Visitors",
+  Anak: {
+    label: "Anak",
+    color: "hsl(var(--destructive))",
   },
-  desktop: {
-    label: "Desktop",
-    color: "var(--primary)",
+  Rumah: {
+    label: "Rumah",
+    color: "hsl(var(--chart-2))",
   },
-  mobile: {
-    label: "Mobile",
-    color: "var(--primary)",
+  Holiday: {
+    label: "Holiday",
+    color: "hsl(var(--chart-3))",
   },
 } satisfies ChartConfig
 
@@ -148,7 +149,8 @@ const pieData = React.useMemo(() => {
   //   startDate.setDate(startDate.getDate() - daysToSubtract)
   //   return date >= startDate
   // })
-const COLORS = ["#059669", "#2563eb", "#dc2626", "#f59e0b"]
+  // console.log(pieData)
+const COLORS = ["var(--chart-1)", "var(--chart-3)", "var(--chart-5)"]
   return (
     <>
     <Card className="@container/card">
@@ -289,7 +291,30 @@ const COLORS = ["#059669", "#2563eb", "#dc2626", "#f59e0b"]
   </CardHeader>
 
   <CardContent className="flex justify-center">
-    <PieChart width={400} height={400}>
+    <ChartContainer
+          config={chartConfig}
+          className="mx-auto w-full max-w-[250px] aspect-square"
+          // className="[&_.recharts-pie-label-text]:fill-foreground mx-auto aspect-square max-h-[250px] pb-0"
+        >
+          <PieChart >
+            <ChartTooltip content={<ChartTooltipContent hideLabel />} />
+            <Pie
+    data={pieData}
+    dataKey="value"
+    nameKey="name"
+    label={({ payload }) => `${payload.percent}%`}
+  >
+    {pieData.map((entry, index) => (
+          <Cell
+            key={`cell-${index}`}
+            fill={COLORS[index % COLORS.length]}
+          />
+        ))}
+  </Pie>
+  <Legend />
+          </PieChart>
+        </ChartContainer>
+    {/* <PieChart width={400} height={400}>
       
       <Pie
         data={pieData}
@@ -323,7 +348,7 @@ const COLORS = ["#059669", "#2563eb", "#dc2626", "#f59e0b"]
       />
 
       <Legend />
-    </PieChart>
+    </PieChart> */}
   </CardContent>
 </Card>
 </>

@@ -10,6 +10,7 @@ import {
   CardTitle,
 } from "@/components/ui/card"
 import { TrendingUpIcon, TrendingDownIcon, Baby, BabyIcon, House, TreePalm, Banknote, MilestoneIcon } from "lucide-react"
+import { StarsBackground } from "./animate-ui/components/backgrounds/stars"
 // import { useEffect, useState } from "react"
 // import { supabase } from "@/lib/supabase"
 type Props = {
@@ -83,7 +84,7 @@ const isDownT = diffTot < 0
         <CardHeader>
           <CardDescription>Tabungan Anak</CardDescription>
           <CardTitle className="text-2xl font-semibold tabular-nums @[250px]/card:text-3xl">
-            Rp. {allData.filter(item => item.jenis === 'Anak').reduce((sum, item) => sum + item.nominal, 0).toLocaleString('id-ID')}
+            Rp {allData.filter(item => item.jenis === 'Anak').reduce((sum, item) => sum + item.nominal, 0).toLocaleString('id-ID')}
           </CardTitle>
           <CardAction>
               <Baby size={30}
@@ -125,7 +126,7 @@ const isDownT = diffTot < 0
         <CardHeader>
           <CardDescription>Tabungan Rumah</CardDescription>
           <CardTitle className="text-2xl font-semibold tabular-nums @[250px]/card:text-3xl">
-            Rp. {allData.filter(item => item.jenis === 'Rumah').reduce((sum, item) => sum + item.nominal, 0).toLocaleString('id-ID')}
+            Rp {allData.filter(item => item.jenis === 'Rumah').reduce((sum, item) => sum + item.nominal, 0).toLocaleString('id-ID')}
           </CardTitle>
           <CardAction>
             <House size={30}
@@ -167,7 +168,7 @@ const isDownT = diffTot < 0
         <CardHeader>
           <CardDescription>Tabungan Holiday</CardDescription>
           <CardTitle className="text-2xl font-semibold tabular-nums @[250px]/card:text-3xl">
-            Rp. {allData.filter(item => item.jenis === 'Holiday').reduce((sum, item) => sum + item.nominal, 0).toLocaleString('id-ID')}
+            Rp {allData.filter(item => item.jenis === 'Holiday').reduce((sum, item) => sum + item.nominal, 0).toLocaleString('id-ID')}
           </CardTitle>
           <CardAction>
             <TreePalm size={30}
@@ -209,7 +210,7 @@ const isDownT = diffTot < 0
         <CardHeader>
           <CardDescription>Total Tabungan</CardDescription>
           <CardTitle className="text-2xl font-semibold tabular-nums @[250px]/card:text-3xl">
-            Rp. {allData.reduce((sum, item) => sum + item.nominal, 0).toLocaleString('id-ID')}
+            Rp {allData.reduce((sum, item) => sum + item.nominal, 0).toLocaleString('id-ID')}
           </CardTitle>
           <CardAction>
             <Banknote size={30}
