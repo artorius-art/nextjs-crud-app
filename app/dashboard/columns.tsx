@@ -21,6 +21,7 @@ import { AlertDialog as BaseAlertDialog } from "@base-ui/react/alert-dialog"
 import { createClient } from "@/utils/supabase/client";
 import { useState } from "react";
 import { Badge } from "@/components/ui/badge"
+import { toast } from "sonner"
 
 function RowActions({ tabungan }: { tabungan: TabunganMaster }) {
   const router = useRouter();
@@ -44,6 +45,11 @@ function RowActions({ tabungan }: { tabungan: TabunganMaster }) {
     }
 
     setOpen(false);
+    toast.success("Sukses !!!", {
+      description: "Tabungan berhasil dihapus.",
+      position: "top-center",
+    });
+
     router.refresh(); // 🔥 refresh table
   };
 

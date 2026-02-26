@@ -189,7 +189,7 @@ const onSubmit = async (data: TabunganValues) => {
       return;
     }
 
-    toast.success("Updated Successfully!", {
+    toast.success("Horee !!!", {
       description: "Data berhasil diperbarui.",
       position: "top-center",
     });
@@ -210,8 +210,8 @@ const onSubmit = async (data: TabunganValues) => {
       return;
     }
 
-    toast.success("Created Successfully!", {
-      description: "Data berhasil disimpan.",
+    toast.success("Horee !!!", {
+      description: "Tabungan berhasil disimpan.",
       position: "top-center",
     });
   }
