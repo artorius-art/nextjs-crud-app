@@ -79,8 +79,23 @@ const isDownT = diffTot < 0
   //   fetchAllData()
   // }, [])
   return (
-    <div className="*:data-[slot=card]:from-primary/5 *:data-[slot=card]:to-card dark:*:data-[slot=card]:bg-card grid grid-cols-1 gap-4 px-4 *:data-[slot=card]:bg-linear-to-t *:data-[slot=card]:shadow-xs lg:px-6 @xl/main:grid-cols-2 @5xl/main:grid-cols-4">
-      <Card className="@container/card">
+    // <div className="*:data-[slot=card]:from-primary/5 *:data-[slot=card]:to-card dark:*:data-[slot=card]:bg-card grid grid-cols-1 gap-4 px-4 *:data-[slot=card]:bg-linear-to-t *:data-[slot=card]:shadow-xs lg:px-6 @xl/main:grid-cols-2 @5xl/main:grid-cols-4">
+    <div className="relative w-full scrollbar-hide">
+  {/* Scroll Container */}
+  <div
+
+  className="
+    snap-container
+    -mx-4 first:ml-4 last:mr-4  scrollbar-hide
+    flex gap-4 overflow-x-auto snap-x snap-mandatory 
+    pt-2 pb-2
+    md:mx-0 md:px-0
+    md:grid md:grid-cols-4
+    md:overflow-visible md:snap-none
+  "
+>
+<Card className="min-w-[85%] snap-start md:min-w-0">
+      {/* <Card className="@container/card"> */}
         <CardHeader>
           <CardDescription>Tabungan Anak</CardDescription>
           <CardTitle className="text-2xl font-semibold tabular-nums @[250px]/card:text-3xl">
@@ -122,7 +137,7 @@ const isDownT = diffTot < 0
             </span>        
           </CardFooter>
       </Card>
-      <Card className="@container/card">
+<Card className="min-w-[85%] snap-center md:min-w-0">
         <CardHeader>
           <CardDescription>Tabungan Rumah</CardDescription>
           <CardTitle className="text-2xl font-semibold tabular-nums @[250px]/card:text-3xl">
@@ -164,7 +179,7 @@ const isDownT = diffTot < 0
             </span>        
           </CardFooter>
       </Card>
-      <Card className="@container/card">
+<Card className="min-w-[85%] snap-center md:min-w-0">
         <CardHeader>
           <CardDescription>Tabungan Holiday</CardDescription>
           <CardTitle className="text-2xl font-semibold tabular-nums @[250px]/card:text-3xl">
@@ -206,7 +221,7 @@ const isDownT = diffTot < 0
             </span>        
           </CardFooter>
       </Card>
-      <Card className="@container/card">
+<Card className="min-w-[85%] snap-end md:min-w-0 mr-4 md:mr-0">
         <CardHeader>
           <CardDescription>Total Tabungan</CardDescription>
           <CardTitle className="text-2xl font-semibold tabular-nums @[250px]/card:text-3xl">
@@ -248,6 +263,8 @@ const isDownT = diffTot < 0
             </span>        
           </CardFooter>
       </Card>
+    </div>
+    
     </div>
   )
 }

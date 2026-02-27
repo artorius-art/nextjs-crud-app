@@ -1,6 +1,6 @@
 'use client'
 import { cn } from "@/lib/utils"
-import { Card, CardContent } from "@/components/ui/card"
+import { Card, CardContent, CardFooter } from "@/components/ui/card"
 import {
   Field,
   FieldDescription,
@@ -16,6 +16,7 @@ import { Button } from '@/components/ui/button'
 import Link from 'next/link'
 import { toast } from "sonner"
 import { Toaster } from "@/components/ui/sonner"
+import { Banknote, LogIn } from "lucide-react"
 export default function Login() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -66,22 +67,16 @@ export default function Login() {
               <Field>
                 <div className="flex items-center">
                   <FieldLabel htmlFor="password">Password</FieldLabel>
-                  <a
-                    href="#"
-                    className="ml-auto text-sm underline-offset-2 hover:underline"
-                  >
-                    Forgot your password?
-                  </a>
                 </div>
                 <Input id="password" type="password" required value={password} onChange={(e) => setPassword(e.target.value)}/>
               </Field>
-              <Field>
-                <Button type="submit" disabled={loading}>{loading ? (
+              {/* <Field>
+                <Button size={'lg'} type="submit" disabled={loading}>{loading ? (
                 'Memproses...'
               ) : (
-                'Masuk'
+                <><LogIn/>Masuk</>
               )}</Button>
-              </Field>
+              </Field> */}
               {/* <FieldSeparator className="*:data-[slot=field-separator-content]:bg-card">
                 Or continue with
               </FieldSeparator>
@@ -114,14 +109,19 @@ export default function Login() {
                   <span className="sr-only">Login with Meta</span>
                 </Button>
               </Field> */}
-               <Toaster richColors  /> 
-              <FieldDescription className="text-center">
-                Don&apos;t have an account? <Link href="/auth/signup" replace>Sign up</Link>
+               
+              <FieldDescription className="">
+               {/* Forgot your password? <Link href="/auth/signup" replace>Sign up</Link> */}
+                Selamat menabung 
                 
-                {/* <a href="#">Sign up</a> */}
               </FieldDescription>
-            </FieldGroup>
-          </form>
+              <Field>
+                <Button size={'lg'} className="w-full" type="submit" disabled={loading}>{loading ? (
+                    'Memproses...'
+                  ) : (
+                    <><LogIn/>Masuk</>
+                  )}</Button>
+              </Field>
           <div className="bg-muted relative hidden md:block">
             <img
               src="/placeholder.svg"
@@ -129,6 +129,10 @@ export default function Login() {
               className="absolute inset-0 h-full w-full object-cover dark:brightness-[0.2] dark:grayscale"
             />
           </div>
+            </FieldGroup>
+
+          </form>
+
         </CardContent>
       </Card>
       <FieldDescription className="px-6 text-center">
@@ -136,6 +140,7 @@ export default function Login() {
         and <a href="#">Privacy Policy</a>.
       </FieldDescription>
     </div>
+    <Toaster richColors  /> 
     </div>
     </div>
 

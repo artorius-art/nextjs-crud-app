@@ -34,7 +34,7 @@ import {
   useComboboxAnchor,
 } from "@/components/ui/combobox"
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card"
-import { Building, Landmark } from "lucide-react"
+import { Building, Landmark, NotebookPen, NotebookPenIcon } from "lucide-react"
 import { useRouter } from "next/navigation"
 
 
@@ -111,10 +111,12 @@ const router = useRouter();
 return (
     <div>
 
-<div className="flex flex-col sm:flex-row items-start gap-4 py-4 w-full">
+<div className="flex flex-wrap items-end gap-3 py-4 w-full">
+{/* <div className="flex flex-col sm:flex-row items-start gap-4 py-4 w-full"> */}
   
 
-  <div className="w-full sm:w-1/2 max-w-xs">
+  <div className="w-[calc(50%-6px)] sm:w-40">
+    {/* <label className="text-xs font-medium mb-1 block sm:hidden">Tahun</label> */}
     <Combobox
       multiple
       autoHighlight
@@ -167,7 +169,8 @@ return (
     </Combobox>
   </div>
 
-  <div className="w-full sm:w-1/2 max-w-xs">
+  <div className="w-[calc(50%-6px)] sm:w-48">
+    {/* <label className="text-xs font-medium mb-1 block sm:hidden">Bulan</label> */}
   <Combobox
       multiple
       
@@ -230,10 +233,17 @@ return (
       </ComboboxContent>
   </Combobox>  
   </div>
-  <div className="w-full sm:w-1/2 max-w-xs float-right">
-  <Button size='lg' variant='default' onClick={handleClick}><Landmark/>Transaksi Tabungan {jenis}</Button>
-  </div>
-  </div>
+<div className="w-full sm:w-auto sm:ml-auto shrink-0">
+    <Button 
+      size='lg' 
+      variant='default' 
+      onClick={handleClick} 
+      className="w-full whitespace-nowrap"
+    >
+      <NotebookPen className="mr-2 h-4 w-4" />
+      Transaksi Tabungan {jenis}
+    </Button>
+  </div>  </div>
 
   <div className="overflow-hidden rounded-md border">
       <Table>
