@@ -85,14 +85,25 @@ const isDownT = diffTot < 0
   <div
 
   className="
-    snap-container
-    -mx-4 first:ml-4 last:mr-4  scrollbar-hide
+     snap-container
+    scrollbar-hide
     flex gap-4 overflow-x-auto snap-x snap-mandatory 
+    px-4 scroll-pl-4
     pt-2 pb-2
-    md:mx-0 md:px-0
+    md:mx-4 md:px-0
     md:grid md:grid-cols-4
     md:overflow-visible md:snap-none
   "
+  style={{ scrollPaddingLeft: '1rem', scrollPaddingRight: '1rem' }}
+  // className="
+  //   snap-container
+  //   -mx-4 first:ml-4 last:mr-4  scrollbar-hide
+  //   flex gap-4 overflow-x-auto snap-x snap-mandatory 
+  //   pt-2 pb-2
+  //   md:mx-0 md:px-0
+  //   md:grid md:grid-cols-4
+  //   md:overflow-visible md:snap-none
+  // "
 >
 <Card className="min-w-[85%] snap-start md:min-w-0">
       {/* <Card className="@container/card"> */}
@@ -221,7 +232,7 @@ const isDownT = diffTot < 0
             </span>        
           </CardFooter>
       </Card>
-<Card className="min-w-[85%] snap-end md:min-w-0 mr-4 md:mr-0">
+<Card className="min-w-[85%] snap-end md:min-w-0 ">
         <CardHeader>
           <CardDescription>Total Tabungan</CardDescription>
           <CardTitle className="text-2xl font-semibold tabular-nums @[250px]/card:text-3xl">
