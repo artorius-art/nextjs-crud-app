@@ -3,7 +3,6 @@ export const revalidate = 0;
 import { ChartAreaInteractive } from "@/components/chart-area-interactive"
 // import { DataTable } from "@/components/data-table"
 import { SectionCards } from "@/components/section-cards"
-import { SiteHeader } from "@/components/site-header"
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar"
 import { columns, Payment, TabunganMaster } from "./columns"
 import { DataTable } from "./data-table"

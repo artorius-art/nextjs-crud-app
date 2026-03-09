@@ -14,7 +14,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar"
-import { LayoutDashboardIcon, ListIcon, ChartBarIcon, FolderIcon, UsersIcon, CameraIcon, FileTextIcon, Settings2Icon, CircleHelpIcon, SearchIcon, DatabaseIcon, FileChartColumnIcon, FileIcon, CommandIcon, ChartBarStackedIcon, Banknote } from "lucide-react"
+import { LayoutDashboardIcon, ListIcon, ChartBarIcon, FolderIcon, UsersIcon, CameraIcon, FileTextIcon, Settings2Icon, CircleHelpIcon, SearchIcon, DatabaseIcon, FileChartColumnIcon, FileIcon, CommandIcon, ChartBarStackedIcon, Banknote, Calendar } from "lucide-react"
 import Image from "next/image"
 const data = {
   user: {
@@ -153,6 +153,14 @@ const data = {
       url: "/dashboard",
       icon: (
         <ChartBarStackedIcon
+        />
+      ),
+    },
+    {
+      name: "Ulang tahun",
+      url: "/birthday",
+      icon: (
+        <Calendar
         />
       ),
     },

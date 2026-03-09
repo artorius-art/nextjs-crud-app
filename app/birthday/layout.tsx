@@ -6,7 +6,6 @@ import { SiteHeader } from "@/components/site-header"
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar"
 import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
-import data from "./data.json"
 
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {  
     
@@ -35,7 +34,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
     >
       <AppSidebar variant="inset" user={user} />
       <SidebarInset>
-        <SiteHeader title="Dashboard"/>
+        <SiteHeader title="Ulang Tahun"/>
         {/* The @container/main class ensures your responsive logic works across all pages */}
         <div className="flex flex-1 flex-col">
           <div className="@container/main flex flex-1 flex-col gap-2">
